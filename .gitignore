@@ -1,0 +1,20 @@
+# Root-level ignores
+node_modules/
+.env
+dist/
+*.log
+
+# Client ignores
+client/node_modules/
+client/dist/
+client/.env
+client/.vite/
+
+# Server ignores
+server/node_modules/
+server/dist/
+server/.env
+
+# OS-specific
+.DS_Store
+Thumbs.db
