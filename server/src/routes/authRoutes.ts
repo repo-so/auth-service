@@ -1,77 +1,100 @@
-//to verify still
-import { Router } from "express";
-import { createUser, findUserByEmail, validatePassword } from "../services/userFunctions";
-import { generateToken, verifyToken } from "../utils/generateToken";
+import { Router, Request, Response } from "express";
+import User from "../models/User";
+import { generateTokens, verifyToken } from "../utils/generateToken";
 import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 
+// -----------------------------
 // Register
-router.post('/register', async (req, res) => {
+// -----------------------------
+router.post("/register", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const existingUser = await findUserByEmail(email);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: "User already exists" });
     }
 
-    const newUser = await createUser(email, password);
-    res.status(201).json({ message: 'User created', user: { email: newUser.email } });
+    const newUser = new User({ email, password });
+    await newUser.save();
+
+    res.status(201).json({ message: "User created", user: { email: newUser.email } });
   } catch (err) {
-    console.error('Register error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Register error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
+// -----------------------------
 // Login
-router.post('/login', async (req, res) => {
+// -----------------------------
+router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
   try {
-    const user = await findUserByEmail(email);
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    const user = await User.findOne({ email });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await validatePassword(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+    const { accessToken, refreshToken } = generateTokens(user._id.toString(), user.email);
 
-    const { accessToken, refreshToken } = generateToken(user._id.toString());
-
-    // Send refreshToken as an HTTP-only cookie
-    res.cookie('refreshToken', refreshToken, {
+    // Refresh token in HttpOnly cookie
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
+      secure: true, 
+      sameSite: "strict",
     });
 
     res.json({ accessToken });
   } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-
-// Profile
-import { Request, Response } from 'express';
-
-router.get('/profile', authMiddleware, async (req: Request, res: Response) => {
+// -----------------------------
+// Refresh Token
+// -----------------------------
+router.post("/refresh", async (req: Request, res: Response) => {
   try {
-    const email = (req as any).email;
+    const token = req.cookies.refreshToken;
+    if (!token) return res.status(401).json({ message: "No refresh token" });
 
-    const user = await findUserByEmail(email); 
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const decoded = verifyToken(token) as { userId: string; email: string };
+    const { accessToken, refreshToken } = generateTokens(decoded.userId, decoded.email);
+
+    // Send new refresh token as cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    res.json({ accessToken });
+  } catch (err) {
+    console.error("Refresh error:", err);
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
+});
+
+// -----------------------------
+// Profile
+// -----------------------------
+router.get("/profile", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({ id: user._id, email: user.email });
   } catch (err) {
-    console.error('Profile error:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Profile error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 export default router;

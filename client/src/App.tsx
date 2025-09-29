@@ -1,13 +1,12 @@
-
+import { BrowserRouter } from "react-router-dom";
+import Router from "./router";
 
 function App() {
-
   return (
-    <>
-      <div className="bg-red-500">helo
-        </div>
-    </>
-  )
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
