@@ -5,9 +5,7 @@ import { authMiddleware } from "../middleware/authMiddleware";
 
 const router = Router();
 
-// -----------------------------
-// Register
-// -----------------------------
+//register
 router.post("/register", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -27,9 +25,7 @@ router.post("/register", async (req: Request, res: Response) => {
   }
 });
 
-// -----------------------------
-// Login
-// -----------------------------
+//login
 router.post("/login", async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -55,9 +51,7 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-// -----------------------------
-// Refresh Token
-// -----------------------------
+//refresh token
 router.post("/refresh", async (req: Request, res: Response) => {
   try {
     const token = req.cookies.refreshToken;
@@ -80,9 +74,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
   }
 });
 
-// -----------------------------
-// Profile
-// -----------------------------
+//profile
 router.get("/profile", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).userId;
