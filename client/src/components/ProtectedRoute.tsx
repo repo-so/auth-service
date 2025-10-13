@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function ProtectedRoute({ children }: Props) { //children (profile) is the component to render if authenticated 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); //while checking auth status
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function ProtectedRoute({ children }: Props) { //children (profil
     checkAuth(); 
   }, []); //On mount, it tries to fetch /auth/profile to check if the user is logged in (no shi)
 //----------If the request succeeds, it allows access to the protected route, else redirects to /login
-  if (loading) return null; //or a spinner component
+  if (loading) return null; //or a spinner component (too lazy now)
 
   if (!authenticated) return <Navigate to="/login" replace />;
 
