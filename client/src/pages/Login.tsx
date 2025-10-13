@@ -10,13 +10,11 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // ✅ Backend sends accessToken in JSON, refreshToken in HttpOnly cookie
-      const { data } = await api.post("/auth/login", { email, password });
-
+      // Backend sends accessToken in JSON, refreshToken in HttpOnly cookie
+      const { data } = await api.post("/auth/login", { email, password }, { withCredentials: true });
       // Save accessToken in memory (axios.ts)
       setAccessToken(data.accessToken);
 
-      // Navigate to profile page
       navigate("/profile");
     } catch (err: any) {
       alert(err.response?.data?.message || "Login failed");

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from "cookie-parser"; //to get cookie data
 import authRoutes from "./routes/authRoutes";
+import profileRoutes from "./routes/profileRoutes";
 import mongoose from 'mongoose';
 
 import dotenv from 'dotenv';
@@ -20,6 +21,7 @@ app.use(cors({
   }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth/profile", profileRoutes);
 
 async function startServer() {
   try {

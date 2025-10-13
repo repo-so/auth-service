@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { User, IUser } from '../models/User'; 
+import User, { IUser } from '../models/User'; 
 
 export const findUserByEmail = async (email: string): Promise<IUser | null> => {
   return await User.findOne({ email });

@@ -1,7 +1,7 @@
 //to retrieve the token from cookies
 import axios from "axios";
 
-// Create an axios instance pointing to our backend API
+// Create an axios instance pointing to the BE starting api
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
   withCredentials: true, //  send cookies (refreshToken) automatically
@@ -52,10 +52,12 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         console.error("Refresh failed, forcing logout");
+        
+        return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error);
+    
   }
 );
 

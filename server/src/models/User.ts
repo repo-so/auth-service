@@ -6,12 +6,14 @@ export interface IUser extends Document {
   email: string;
   password: string;
   comparePassword(candidate: string): Promise<boolean>;
+  subscribedLessons: [string | Types.ObjectId];
 }
 
 const userSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    subscribedLessons: [{ type: Schema.Types.ObjectId, ref: 'Lesson' }]
   },
   { timestamps: true }
 );
@@ -31,4 +33,4 @@ userSchema.methods.comparePassword = async function (candidate: string) {
 };
 
 const User = mongoose.model<IUser>("User", userSchema);
-export default User;
+export default User; 

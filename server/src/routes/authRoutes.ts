@@ -40,7 +40,7 @@ router.post("/login", async (req: Request, res: Response) => {
     // Refresh token in HttpOnly cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: true, 
+      secure: false, 
       sameSite: "strict",
     });
 
@@ -65,6 +65,7 @@ router.post("/refresh", async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false,
       sameSite: "strict",
+      path: "/",
     });
 
     res.json({ accessToken });
