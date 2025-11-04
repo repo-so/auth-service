@@ -9,6 +9,11 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+     if (!email || !password) {
+    alert("Please fill out both email and password fields.");
+    return; 
+  }
     try {
       // Backend sends accessToken in JSON, refreshToken in HttpOnly cookie
       const { data } = await api.post("/auth/login", { email, password }, { withCredentials: true });
@@ -22,13 +27,14 @@ export default function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 max-w-sm mx-auto space-y-4">
-      <h1 className="text-xl font-bold">Login</h1>
+    <div className="w-screen h-screen flex justify-center items-center">
+    <form onSubmit={handleSubmit} className="p-6 max-w-sm mx-auto space-y-4 border-1 border-gray-300 rounded-xl bg-[#2a2a2a]">
+      <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Manrope, sans-serif' }}>Login</h1>
 
       <input
         type="email"
         placeholder="Email"
-        className="border p-2 w-full"
+        className="outline-1 outline-white p-2 w-full rounded-sm text-white"
         value={email}
         onChange={e => setEmail(e.target.value)}
       />
@@ -36,14 +42,15 @@ export default function Login() {
       <input
         type="password"
         placeholder="Password"
-        className="border p-2 w-full"
+        className="outline-1 outline-white p-2 w-full rounded-sm text-white"
         value={password}
         onChange={e => setPassword(e.target.value)}
       />
 
-      <button className="bg-blue-500 text-white px-4 py-2 rounded">
+      <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 cursor-pointer font-semibold" style={{ fontFamily: 'Manrope, sans-serif' }} type="submit">
         Login
       </button>
     </form>
+    </div>
   );
 }
